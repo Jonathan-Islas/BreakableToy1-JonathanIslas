@@ -72,7 +72,7 @@ export const SearchFrame = () => {
                     </Select>
                 </FormControl>
                 <FormControl sx={{ minWidth: '150px' }}>
-                    <InputLabel id={'taskState-filter-selection'}>Task State</InputLabel>
+                    <InputLabel id={'taskState-filter-selection'}>ToDo State</InputLabel>
                     <Select
                         value={taskState}
                         labelId={'taskState-filter-selection'}

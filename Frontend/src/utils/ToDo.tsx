@@ -5,7 +5,7 @@ export interface ToDo {
     id: string;
     text: string;
     dueDate: string | null;
-    status: boolean;
+    isFinished: boolean;
     finishedDate?: number;
     priority: number | null;
     createdDate: number;

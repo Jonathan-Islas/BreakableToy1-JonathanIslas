@@ -16,13 +16,16 @@ import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import {fetchToDos, apiClient} from '../../services/api/ToDoAPI';
+import { fetchToDos, deleteToDo, changeToDoStatus } from '../../services/api/ToDoAPI';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { type ToDo } from '../../utils/ToDo';
+import { useToDos } from '../../services/api/ToDoContext';
 //Icons
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import { UpdateToDoModal } from '../newToDoModal/UpdateToDoModal';
+import { StrikethroughS } from '@mui/icons-material';
 
 // 120 char string 
 // Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis nat
@@ -41,19 +44,22 @@ const getPriorityProps = (priority: number | null) => {
 
 
 export const TableFrame = () => {
-    const [todos, setToDos] = useState<ToDo[]>([]);
-    const [page, setPage] = React.useState(0);
+    //Get context from ToDoContext.tsx
+    // const { toDos, loading, error, refreshToDos } = useToDos();
+    const toDos = useToDos().toDos;
+    const refreshToDos = useToDos().refreshToDos;
 
-    // load and fetch function for all todos
-    const loadToDos = async () => {
-        const todos = await fetchToDos();
-        setToDos(todos);
-        console.log('todos use effect', todos)
-    }
+    // const refreshToDos = useToDos().refreshToDos;
+    const [page, setPage] = useState(0);
+
+    // UpdateModalControls
+    const [openUpdateModal, setOpenUpdateModal] = useState< boolean >(false);
+    const [currentToDo, setCurrentToDo] = useState< ToDo | null >(null);
+
 
     // first mount todos load
     useEffect(() => {
-        loadToDos();
+        refreshToDos();
     }, []);
 
     // Pagination for MUI Table 
@@ -61,12 +67,32 @@ export const TableFrame = () => {
         setPage(newPage);
     };
 
+    // Checkbox ToDo status change
+    const handleCheckBoxClick = async (id: string, isFinished: boolean) => {
+        try {
+            console.log(isFinished);
+            await changeToDoStatus(id, isFinished);
+            await refreshToDos();
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
     // ToDo Delete Button action
     const handleDeleteClick = async (id: string) => {
-        if (window.confirm('Are you sure you want to delete this ToDo?')) {
-            const response = await apiClient.delete<string>(`todos/${id}`);
-            loadToDos()
-        }
+        try {
+            await deleteToDo(id);
+            await refreshToDos();
+        } catch (error) {
+            console.error(error);
+        };
+    }
+
+    // Update IconButton Action
+    const handleUpdateClick = async (toDo: ToDo) => {
+        console.log(toDo);
+        await setCurrentToDo(toDo);
+        await setOpenUpdateModal(!openUpdateModal);
     }
 
     return (
@@ -87,11 +113,11 @@ export const TableFrame = () => {
                         <TableCell>Task Name</TableCell>
                         <TableCell>Priority</TableCell>
                         <TableCell>Due Date</TableCell>
-                        <TableCell>Actions</TableCell>
+                        <TableCell align={'right'}>Actions</TableCell>
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {todos
+                    {toDos
                         // .slice(page * 10, page * 10 + 10)
                         .map((toDo) => (
                             <TableRow
@@ -101,20 +127,22 @@ export const TableFrame = () => {
                                 <TableCell padding={'checkbox'} sx={{ paddingLeft: 2 }}>
                                     <Checkbox
                                         color={'primary'}
-                                        checked={false}
+                                        checked={toDo.isFinished}
+                                        onClick={() => handleCheckBoxClick(toDo.id, !toDo.isFinished)}
                                     />
                                 </TableCell>
                                 <TableCell
                                     component={'th'}
                                     scope={'row'}
-                                >
+                                    style={toDo.isFinished ? {textDecoration: 'line-through'} : {}}
+                                > 
                                     {toDo.text}
                                 </TableCell>
                                 <TableCell sx={{ color: getPriorityProps(toDo.priority).color }}>{getPriorityProps(toDo.priority).label}</TableCell>
                                 <TableCell>{toDo.dueDate}</TableCell>
-                                <TableCell>
+                                <TableCell align={'right'}>
                                     <Box>
-                                        <IconButton aria-label={'edit'} disabled>
+                                        <IconButton aria-label={'edit'} disabled onClick={() => handleUpdateClick(toDo)}>
                                             <EditIcon />
                                         </IconButton>
                                         <IconButton aria-label={'delete'} onClick={() => handleDeleteClick(toDo.id)}>
@@ -131,10 +159,11 @@ export const TableFrame = () => {
                 rowsPerPageOptions={[10]}
                 rowsPerPage={10}
                 component={'div'}
-                count={todos.length}
+                count={toDos.length}
                 page={page}
                 onPageChange={handlePageChange}
             />
+            {/* <UpdateToDoModal todo={currentToDo} open={openUpdateModal} setOpen={setOpenUpdateModal} /> */}
         </TableContainer>
     )
 }

@@ -5,7 +5,7 @@ public class ToDo {
     private String id;
     private String text;
     private String dueDate;
-    private boolean isFinished;
+    private boolean isFinished = false;
     private long finishedDate;
     private int priority;
     private long createdDate;

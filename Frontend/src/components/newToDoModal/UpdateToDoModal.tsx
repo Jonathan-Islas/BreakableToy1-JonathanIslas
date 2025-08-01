@@ -4,8 +4,7 @@ import Dialog from "@mui/material/Dialog";
 import DialogContent from "@mui/material/DialogContent";
 import DialogContentText from "@mui/material/DialogContentText";
 import DialogTitle from "@mui/material/DialogTitle";
-import { useState } from "react";
-import { FloatingButton } from "./floatingButton";
+import { useEffect, useState } from "react";
 import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
@@ -23,25 +22,37 @@ import type { ToDo } from "../../utils/ToDo";
 import { createToDo } from "../../services/api/ToDoAPI";
 import { useToDos } from "../../services/api/ToDoContext";
 
-export const NewToDoModal = () => {
+interface UpdateToDoModalProps {
+    todo?: ToDo,
+    open: boolean,
+    setOpen: React.Dispatch<React.SetStateAction<boolean>>
+}
+
+export const UpdateToDoModal: React.FC<UpdateToDoModalProps> = ({todo, open = false, setOpen}) => {
     // Get refreshToDos from ToDoContext
     const refreshToDos = useToDos().refreshToDos;
-
+    console.log()
     //Modal render
-    const [openDialog, setOpenDialog] = useState(false);
-    const handleClose = () => setOpenDialog(false);
+    const handleClose = () => setOpen(false);
 
     // Modal Form 
     const [priority, setPriority] = useState<number | null>(0);
-    const [toDoText, setToDoText] = useState('');
-    const [dueDate, setDueDate] = useState<Dayjs | null>(null);
+    const [toDoText, setToDoText] = useState('todo.text');
+    const [dueDate, setDueDate] = useState<Dayjs | null>(dayjs('2025'));
+
+    useEffect(() => {
+        setPriority(todo?.priority);
+        setToDoText(todo?.text);
+        setDueDate(todo?.dueDate);
+    }, [])
+    
 
     const changePriority = (event: SelectChangeEvent) => {
         setPriority(parseInt(event.target.value));
     };
 
     const handleCloseWithCleanUp = () => {
-        setOpenDialog(false);
+        setOpen(false);
         setToDoText('');
         setPriority(0);
     };
@@ -50,11 +61,11 @@ export const NewToDoModal = () => {
         event.preventDefault();
 
         const formJson: ToDo = {
-            id: Date.now().toString(),
+            id: todo.id,
             text: toDoText,
             priority: priority,
             dueDate: dueDate ? dueDate.format('dddd DD, MMMM YYYY').toString() : null,
-            createdDate: Date.now(),
+            createdDate: todo.createdDate,
             isFinished: false
         };
 
@@ -72,18 +83,17 @@ export const NewToDoModal = () => {
 
     return (
         <>
-            <FloatingButton openDialog={openDialog} setOpenDialog={setOpenDialog} />
             <Dialog
-                open={openDialog}
+                open={open}
                 onClose={handleClose}
                 sx={{
                     '& .MuiDialog-paper': { height: 'fit-content' }
                 }}
             >
-                <DialogTitle>New ToDo</DialogTitle>
+                <DialogTitle>Update ToDo</DialogTitle>
                 <DialogContent sx={{ paddingBottom: 0 }}>
                     <DialogContentText>
-                        Create your new ToDo task by filling the form!
+                        Update your new ToDo task by filling the form!
                     </DialogContentText>
                     <form onSubmit={handleSubmit}>
                         <FormControl
@@ -138,8 +148,8 @@ export const NewToDoModal = () => {
                             </FormControl>
                         </FormControl>
                         <DialogActions>
-                            <Button onClick={handleCloseWithCleanUp}>Cancel</Button>
-                            <Button type="submit" color="secondary">Create</Button>
+                            <Button onClick={handleClose}>Cancel</Button>
+                            <Button type="submit" color="secondary">Update</Button>
                         </DialogActions>
                     </form>
                 </DialogContent>
@@ -147,3 +157,5 @@ export const NewToDoModal = () => {
         </>
     )
 }
+
+export default UpdateToDoModal;
