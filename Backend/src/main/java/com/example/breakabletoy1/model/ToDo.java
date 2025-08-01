@@ -4,7 +4,7 @@ public class ToDo {
 
     private String id;
     private String text;
-    private long dueDate;
+    private String dueDate;
     private boolean isFinished;
     private long finishedDate;
     private int priority;
@@ -13,7 +13,7 @@ public class ToDo {
     // constructors
     public ToDo() {}
 
-    public ToDo(String id, String text, long dueDate, boolean isFinished, long finishedDate, int priority, long createdDate) {
+    public ToDo(String id, String text, String dueDate, boolean isFinished, long finishedDate, int priority, long createdDate) {
         this.id = id;
         this.text = text;
         this.dueDate = dueDate;
@@ -38,10 +38,10 @@ public class ToDo {
         this.text = text;
     }
 
-    public long getdueDate() {
+    public String getdueDate() {
         return dueDate;
     }
-    public void setDueDate(long dueDate) {
+    public void setDueDate(String dueDate) {
         this.dueDate = dueDate;
     }
 

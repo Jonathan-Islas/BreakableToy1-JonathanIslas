@@ -11,16 +11,17 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/todos")
-@CrossOrigin(origins = "http://localhost:8080")
+// @CrossOrigin(origins = "http://localhost:8080")
+@CrossOrigin(origins = "*")
 public class ToDoController {
     private List<ToDo> todos = new ArrayList<>();
     private int currentId = 1;
 
     @PostConstruct
     public void init() {
-        todos.add(new ToDo("some", "body once told me", 1212121212, false, 121212,
+        todos.add(new ToDo("some", "body once told me", "2020", false, 121212,
          2, 121112121));
-        todos.add(new ToDo("body", "body once told me", 1212121212, false, 121212,
+        todos.add(new ToDo("body", "body once told me", "2021", false, 121212,
          2, 121112121));
     }
 
@@ -31,10 +32,14 @@ public class ToDoController {
 
     @PostMapping
     public ToDo createTodo(@RequestBody ToDo todo) {
-        System.out.println(todo);
-        todo.setId(String.valueOf(currentId++));
-        todo.setCreatedDate(System.currentTimeMillis());
         todos.add(todo);
         return todo;
+    }
+
+    @DeleteMapping("/{id}")
+    public String deleteToDo(@PathVariable String id) {
+        todos.removeIf(todo -> todo.getId().equals(id));
+        System.out.println(id + " deleted.");
+        return "Todo " + id + "deleted.";
     }
 }

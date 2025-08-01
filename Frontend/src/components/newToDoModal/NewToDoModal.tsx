@@ -18,6 +18,9 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import type { FieldChangeHandler } from "@mui/x-date-pickers/internals";
+import axios from "axios";
+import type { ToDo } from "../../utils/ToDo";
+import fetchToDos from "../../services/api/ToDoAPI";
 
 export const NewToDoModal = () => {
     //Modal render
@@ -25,18 +28,41 @@ export const NewToDoModal = () => {
     const handleClose = () => setOpenDialog(false);
 
     // Modal Form 
-    const [priority, setPriority] = useState('');
+    const [priority, setPriority] = useState<number | null>(null);
     const [toDoText, setToDoText] = useState('');
-    const [dueDate, setDueDate] = useState<Dayjs | null>(dayjs());
+    const [dueDate, setDueDate] = useState<Dayjs | null>(null);
 
     const changePriority = (event: SelectChangeEvent) => {
-        setPriority(event.target.value);
+        setPriority(parseInt(event.target.value));
     };
 
-    const handleCancel = () => {
+    const handleCloseWithCleanUp = () => {
         setOpenDialog(false);
         setToDoText('');
-        setPriority('');
+        setPriority(null);
+    };
+
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const formJson: ToDo = {
+            id: Date.now().toString(),
+            text: toDoText,
+            priority: priority,
+            dueDate: dueDate ? dueDate.format('dddd DD, MMMM YYYY').toString() : null,
+            createdDate: Date.now(),
+            status: false
+        };
+
+
+        try {
+            const response = await axios.post<ToDo>('http://localhost:9090/api/todos', formJson);
+        } catch (err) {
+            console.error(err);
+        };
+
+        console.log(formJson);
+        handleClose();
     };
 
 
@@ -55,8 +81,8 @@ export const NewToDoModal = () => {
                     <DialogContentText>
                         Create your new ToDo task by filling the form!
                     </DialogContentText>
-                    <form /*onSubmit={handleSubmit}*/>
-                        <Box
+                    <form onSubmit={handleSubmit}>
+                        <FormControl
                             sx={{
                                 padding: '1rem',
                                 boxSizing: 'border-box',
@@ -69,16 +95,20 @@ export const NewToDoModal = () => {
                         >
                             <TextField
                                 label={'ToDo'}
+                                id={'toDoText'}
+                                autoFocus
+                                required
                                 fullWidth
                                 multiline
                                 value={toDoText}
+                                type={'text'}
                                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                                     setToDoText(event.target.value);
                                 }}
-                            >
-
-                            </TextField>
-                            <FormControl fullWidth>
+                                slotProps={{ htmlInput: { maxLength: 120 } }}
+                                helperText={'Characters left: ' + (120 - toDoText.length)}
+                            />
+                            <FormControl required fullWidth>
                                 <InputLabel id={'priority-filter-selection'}>Priority</InputLabel>
                                 <Select
                                     value={priority}
@@ -86,12 +116,12 @@ export const NewToDoModal = () => {
                                     label={'Priority'}
                                     onChange={changePriority}
                                 >
-                                    <MenuItem value={'low'}>Low</MenuItem>
-                                    <MenuItem value={'medium'}>Medium</MenuItem>
-                                    <MenuItem value={'high'}>High</MenuItem>
+                                    <MenuItem value={0}>Low</MenuItem>
+                                    <MenuItem value={1}>Medium</MenuItem>
+                                    <MenuItem value={2}>High</MenuItem>
                                 </Select>
                             </FormControl>
-                            <FormControl fullWidth>
+                            <FormControl required fullWidth>
                                 <LocalizationProvider dateAdapter={AdapterDayjs}>
                                     <DatePicker
                                         disablePast
@@ -102,9 +132,9 @@ export const NewToDoModal = () => {
                                     />
                                 </LocalizationProvider>
                             </FormControl>
-                        </Box>
+                        </FormControl>
                         <DialogActions>
-                            <Button onClick={handleCancel}>Cancel</Button>
+                            <Button onClick={handleCloseWithCleanUp}>Cancel</Button>
                             <Button type="submit" color="secondary">Create</Button>
                         </DialogActions>
                     </form>

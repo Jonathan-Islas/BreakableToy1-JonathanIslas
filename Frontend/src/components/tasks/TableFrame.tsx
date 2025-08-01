@@ -15,60 +15,59 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
-import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
-// import { fetchToDos } from '../../utils/GetToDos';
+import {fetchToDos, apiClient} from '../../services/api/ToDoAPI';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { type ToDo } from '../../utils/ToDo';
+//Icons
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
 
 // 120 char string 
 // Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis nat
 
-// const StyledTableCell = styled(TableCell)({
-//     borderRight: '1px solid #dcedc8'
-// });
+// Priority table cell formatting
+const getPriorityProps = (priority: number | null) => {
+    const priorityData = {
+        0: { label: 'Low', color: 'success.main' },
+        1: { label: 'Medium', color: 'warning.main' },
+        2: { label: 'High', color: 'error.main' }
+    };
+    return priorityData[priority as keyof typeof priorityData] ||
+        { label: 'Unknown', color: 'text.secondary' };
+};
 
 
-interface ToDo {
-    id: string;
-    text: string;
-    dueDate: number;
-    status: boolean;
-    finishedDate?: number;
-    priority: number;
-    createdDate: number;
-}
 
 export const TableFrame = () => {
-    const [toDoList, setToDoList] = useState([])
-
-    const [todos, setTodos] = useState<ToDo[]>([]);
-
-    // useEffect(() => {
-    //     const todos = fetchToDos();
-    //     setToDoList(todos);
-    //     console.log('todos use effect', todos)
-    // }, []);
-
+    const [todos, setToDos] = useState<ToDo[]>([]);
     const [page, setPage] = React.useState(0);
 
+    // load and fetch function for all todos
+    const loadToDos = async () => {
+        const todos = await fetchToDos();
+        setToDos(todos);
+        console.log('todos use effect', todos)
+    }
+
+    // first mount todos load
+    useEffect(() => {
+        loadToDos();
+    }, []);
+
+    // Pagination for MUI Table 
     const handlePageChange = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
 
-    useEffect(() => {
-        const fetchTodos = async () => {
-
-            try {
-                const response = await axios.get<ToDo[]>('http://localhost:9090/api/todos');
-                setTodos(response.data);
-                console.log(todos);
-            } catch (err) {
-                console.error(err); 
-            };
+    // ToDo Delete Button action
+    const handleDeleteClick = async (id: string) => {
+        if (window.confirm('Are you sure you want to delete this ToDo?')) {
+            const response = await apiClient.delete<string>(`todos/${id}`);
+            loadToDos()
         }
-        fetchTodos();
-    }, []);
+    }
 
     return (
         <TableContainer component={Paper}
@@ -99,7 +98,7 @@ export const TableFrame = () => {
                                 key={toDo.id}
                                 hover
                             >
-                                <TableCell padding={'checkbox'}>
+                                <TableCell padding={'checkbox'} sx={{ paddingLeft: 2 }}>
                                     <Checkbox
                                         color={'primary'}
                                         checked={false}
@@ -111,9 +110,18 @@ export const TableFrame = () => {
                                 >
                                     {toDo.text}
                                 </TableCell>
-                                <TableCell>{toDo.priority}</TableCell>
-                                <TableCell>{new Date(toDo.dueDate).toLocaleString()}</TableCell>
-                                <TableCell>{toDo.id}</TableCell>
+                                <TableCell sx={{ color: getPriorityProps(toDo.priority).color }}>{getPriorityProps(toDo.priority).label}</TableCell>
+                                <TableCell>{toDo.dueDate}</TableCell>
+                                <TableCell>
+                                    <Box>
+                                        <IconButton aria-label={'edit'} disabled>
+                                            <EditIcon />
+                                        </IconButton>
+                                        <IconButton aria-label={'delete'} onClick={() => handleDeleteClick(toDo.id)}>
+                                            <DeleteIcon />
+                                        </IconButton>
+                                    </Box>
+                                </TableCell>
                             </TableRow>
                         ))}
                 </TableBody>

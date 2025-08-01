@@ -32,7 +32,7 @@ function App() {
       <SearchFrame />
       <TableFrame />
       <MetricsFrame />
-      <NewToDoModal/>
+      <NewToDoModal />
     </MainFrame>
   )
 }
