@@ -53,8 +53,8 @@ export const TableFrame = () => {
     const [page, setPage] = useState(0);
 
     // UpdateModalControls
-    const [openUpdateModal, setOpenUpdateModal] = useState< boolean >(false);
-    const [currentToDo, setCurrentToDo] = useState< ToDo | null >(null);
+    const [openUpdateModal, setOpenUpdateModal] = useState<boolean>(false);
+    const [currentToDo, setCurrentToDo] = useState<ToDo | null>(null);
 
 
     // first mount todos load
@@ -89,10 +89,11 @@ export const TableFrame = () => {
     }
 
     // Update IconButton Action
-    const handleUpdateClick = async (toDo: ToDo) => {
-        console.log(toDo);
-        await setCurrentToDo(toDo);
-        await setOpenUpdateModal(!openUpdateModal);
+    const handleUpdateClick = (toDo: ToDo) => {
+        console.log('updateClick / / ', toDo);
+        setCurrentToDo(toDo);
+        console.log('Current ToDo / / ', currentToDo);
+        setOpenUpdateModal(true);
     }
 
     return (
@@ -134,15 +135,15 @@ export const TableFrame = () => {
                                 <TableCell
                                     component={'th'}
                                     scope={'row'}
-                                    style={toDo.isFinished ? {textDecoration: 'line-through'} : {}}
-                                > 
+                                    style={toDo.isFinished ? { textDecoration: 'line-through' } : {}}
+                                >
                                     {toDo.text}
                                 </TableCell>
                                 <TableCell sx={{ color: getPriorityProps(toDo.priority).color }}>{getPriorityProps(toDo.priority).label}</TableCell>
                                 <TableCell>{toDo.dueDate}</TableCell>
                                 <TableCell align={'right'}>
                                     <Box>
-                                        <IconButton aria-label={'edit'} disabled onClick={() => handleUpdateClick(toDo)}>
+                                        <IconButton aria-label={'edit'} disabled={toDo.isFinished} onClick={() => handleUpdateClick(toDo)}>
                                             <EditIcon />
                                         </IconButton>
                                         <IconButton aria-label={'delete'} onClick={() => handleDeleteClick(toDo.id)}>
@@ -150,6 +151,9 @@ export const TableFrame = () => {
                                         </IconButton>
                                     </Box>
                                 </TableCell>
+                                {openUpdateModal && currentToDo && (
+                                    <UpdateToDoModal todo={currentToDo} open={openUpdateModal} setOpen={setOpenUpdateModal} />
+                                )}
                             </TableRow>
                         ))}
                 </TableBody>
@@ -163,7 +167,6 @@ export const TableFrame = () => {
                 page={page}
                 onPageChange={handlePageChange}
             />
-            {/* <UpdateToDoModal todo={currentToDo} open={openUpdateModal} setOpen={setOpenUpdateModal} /> */}
         </TableContainer>
     )
 }

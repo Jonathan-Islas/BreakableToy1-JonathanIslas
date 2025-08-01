@@ -43,7 +43,7 @@ export const UpdateToDoModal: React.FC<UpdateToDoModalProps> = ({todo, open = fa
     useEffect(() => {
         setPriority(todo?.priority);
         setToDoText(todo?.text);
-        setDueDate(todo?.dueDate);
+        setDueDate(dayjs(todo?.dueDate));
     }, [])
     
 
