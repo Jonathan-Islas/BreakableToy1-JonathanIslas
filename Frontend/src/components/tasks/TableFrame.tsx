@@ -17,7 +17,9 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
-import React from 'react';
+// import { fetchToDos } from '../../utils/GetToDos';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
 // 120 char string 
 // Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis nat
@@ -26,7 +28,6 @@ import React from 'react';
 //     borderRight: '1px solid #dcedc8'
 // });
 
-const dummyDueDate: number = new Date('2025-07-28T10:30:00.000Z').getTime();
 
 interface ToDo {
     id: string;
@@ -38,41 +39,36 @@ interface ToDo {
     createdDate: number;
 }
 
-const dummyTodo: ToDo = {
-    id: '19DyX0',
-    text: 'Take out the trash pretty pls',
-    dueDate: dummyDueDate,
-    status: false,
-    priority: 0,
-    createdDate: Date.now(),
-}
-
-const toDoList: ToDo[] = [
-    dummyTodo,
-    { id: 'Pr3sD', text: 'Feed them CATSSS', dueDate: dummyDueDate, status: false, priority: 1, createdDate: Date.now() },
-    { id: 'J8iOd', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd1', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd12', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd3', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd4', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd5', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd6', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd7', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd8', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd9', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd10', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd11', text: 'Play some games', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() },
-    { id: 'J8iOd12', text: 'Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis nat', dueDate: dummyDueDate+18900, status: false, priority: 2, createdDate: Date.now() }
-]
-
-
 export const TableFrame = () => {
+    const [toDoList, setToDoList] = useState([])
+
+    const [todos, setTodos] = useState<ToDo[]>([]);
+
+    // useEffect(() => {
+    //     const todos = fetchToDos();
+    //     setToDoList(todos);
+    //     console.log('todos use effect', todos)
+    // }, []);
 
     const [page, setPage] = React.useState(0);
 
     const handlePageChange = (event: unknown, newPage: number) => {
         setPage(newPage);
     };
+
+    useEffect(() => {
+        const fetchTodos = async () => {
+
+            try {
+                const response = await axios.get<ToDo[]>('http://localhost:9090/api/todos');
+                setTodos(response.data);
+                console.log(todos);
+            } catch (err) {
+                console.error(err); 
+            };
+        }
+        fetchTodos();
+    }, []);
 
     return (
         <TableContainer component={Paper}
@@ -85,7 +81,7 @@ export const TableFrame = () => {
                 justifyContent: 'space-between'
             }}
         >
-            <Table stickyHeader sx={{ width: '100%', height: '90%' }}>
+            <Table stickyHeader sx={{ width: '100%', }}>
                 <TableHead>
                     <TableRow>
                         <TableCell>Status</TableCell>
@@ -96,40 +92,43 @@ export const TableFrame = () => {
                     </TableRow>
                 </TableHead>
                 <TableBody>
-                    {toDoList
-                    .slice(page * 10, page * 10 + 10 )
-                    .map((toDo) => (
-                        <TableRow
-                            key={toDo.id}
-                            hover
-                        >
-                            <TableCell padding={'checkbox'}>
-                                <Checkbox
-                                    color={'primary'}
-                                    checked={false}
-                                />
-                            </TableCell>
-                            <TableCell
-                                component={'th'}
-                                scope={'row'}
+                    {todos
+                        // .slice(page * 10, page * 10 + 10)
+                        .map((toDo) => (
+                            <TableRow
+                                key={toDo.id}
+                                hover
                             >
-                                {toDo.text}
-                            </TableCell>
-                            <TableCell>{toDo.priority}</TableCell>
-                            <TableCell>{new Date(toDo.dueDate).toLocaleString()}</TableCell>
-                            <TableCell>{toDo.id}</TableCell>
-                        </TableRow>
-                    ))}
+                                <TableCell padding={'checkbox'}>
+                                    <Checkbox
+                                        color={'primary'}
+                                        checked={false}
+                                    />
+                                </TableCell>
+                                <TableCell
+                                    component={'th'}
+                                    scope={'row'}
+                                >
+                                    {toDo.text}
+                                </TableCell>
+                                <TableCell>{toDo.priority}</TableCell>
+                                <TableCell>{new Date(toDo.dueDate).toLocaleString()}</TableCell>
+                                <TableCell>{toDo.id}</TableCell>
+                            </TableRow>
+                        ))}
                 </TableBody>
             </Table>
             <TablePagination
+                height={'150px'}
                 rowsPerPageOptions={[10]}
                 rowsPerPage={10}
                 component={'div'}
-                count={toDoList.length}
+                count={todos.length}
                 page={page}
                 onPageChange={handlePageChange}
             />
         </TableContainer>
     )
 }
+
+export default TableFrame;

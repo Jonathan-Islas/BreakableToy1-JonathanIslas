@@ -17,12 +17,12 @@ export const SearchFrame = () => {
         <Paper
             sx={{
                 height: '150px',
-                width: 'fit-content',
-                maxWidth: '90%',
+                width: { xs: '100%', sm: '100%', md: 'fit-content' },
                 borderRadius: '1rem',
                 padding: '1rem',
                 boxSizing: 'border-box',
                 display: 'flex',
+                flexDirection: { xs: 'column', sm: 'column', md: 'row' },
                 justifyContent: 'center',
                 alignItems: 'center',
                 gap: '1rem',
@@ -40,10 +40,12 @@ export const SearchFrame = () => {
                 ToDo
             </Typography>
             <Box
+                width={'100%'}
                 sx={{
                     padding: '1rem',
                     boxSizing: 'border-box',
                     display: 'flex',
+                    flexDirection: { xs: 'column', sm: 'column', md: 'row' },
                     justifyContent: 'center',
                     alignItems: 'center',
                     gap: '1rem',
@@ -51,7 +53,7 @@ export const SearchFrame = () => {
             >
                 <TextField
                     label={'Task name'}
-                    sx={{ minWidth: '500px' }}
+                    sx={{ minWidth: { xs: '80%', sm: '220%', md: '500px' } }}
                 >
 
                 </TextField>

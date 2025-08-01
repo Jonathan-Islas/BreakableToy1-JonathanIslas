@@ -4,6 +4,7 @@ import { Box, Typography } from '@mui/material'
 import { SearchFrame } from './components/searchAndFilters/SearchFrame';
 import { TableFrame } from './components/tasks/TableFrame';
 import { MetricsFrame } from './components/metrics/MetricsFrame';
+import { NewToDoModal } from './components/newToDoModal/NewToDoModal';
 
 //Main frame that contains the web app and its components
 const MainFrame = styled(Box)({
@@ -31,6 +32,7 @@ function App() {
       <SearchFrame />
       <TableFrame />
       <MetricsFrame />
+      <NewToDoModal/>
     </MainFrame>
   )
 }
