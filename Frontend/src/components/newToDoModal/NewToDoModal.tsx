@@ -43,6 +43,7 @@ export const NewToDoModal = () => {
     const handleCloseWithCleanUp = () => {
         setOpenDialog(false);
         setToDoText('');
+        setDueDate(null);
         setPriority(0);
     };
 
