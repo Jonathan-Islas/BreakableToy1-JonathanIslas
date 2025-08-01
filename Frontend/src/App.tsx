@@ -1,4 +1,4 @@
-import { styled } from '@mui/system';
+import { height, styled } from '@mui/system';
 import './App.css'
 import { Box, Typography } from '@mui/material'
 import { SearchFrame } from './components/searchAndFilters/SearchFrame';
@@ -10,6 +10,8 @@ import { TodosProvider } from './services/api/ToDoContext';
 //Main frame that contains the web app and its components
 const MainFrame = styled(Box)({
   height: '100svh',
+  // height: {xs: 'fit-content', md:'100svh', lg: '100svh'},
+  width: '100svw',
   boxSizing: 'border-box',
   paddingLeft: '5%',
   paddingRight: '5%',
@@ -21,7 +23,11 @@ const MainFrame = styled(Box)({
   // justifyContent: 'center',
   alignItems: 'center',
   // I shall Delete this line when done with visual representation of space
-  border: '1px solid red'
+  // border: '1px solid red',
+  overflowY: { xs: 'auto', sm: 'auto' },
+  '@media(max-width: 500)': {
+    height: 'fit-content'
+  }
 });
 
 function App() {

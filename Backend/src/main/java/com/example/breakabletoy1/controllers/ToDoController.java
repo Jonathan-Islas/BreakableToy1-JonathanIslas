@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/todos")
@@ -65,4 +66,33 @@ public class ToDoController {
             todos.put(id, update.get("toDo"));
         }
     }
+    @GetMapping("/filter")
+public List<ToDo> getFilteredTodos(
+        @RequestParam(required = false) String text,
+        @RequestParam(required = false) Integer priority,
+        @RequestParam(required = false) Boolean isFinished) {
+    
+    List<ToDo> filteredTodos = new ArrayList<>(todos.values());
+
+    if (text != null && !text.isEmpty()) {
+        filteredTodos = filteredTodos.stream()
+                .filter(todo -> todo.getText().toLowerCase().contains(text.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    if (priority != null) {
+        filteredTodos = filteredTodos.stream()
+                .filter(todo -> todo.getPriority() == priority)
+                .collect(Collectors.toList());
+    }
+
+    if (isFinished != null) {
+        filteredTodos = filteredTodos.stream()
+                .filter(todo -> todo.getIsFinished() == isFinished)
+                .collect(Collectors.toList());
+    }
+    System.out.println(filteredTodos);
+    return filteredTodos;
+}
+
 }

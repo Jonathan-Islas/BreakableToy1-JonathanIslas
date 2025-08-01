@@ -14,7 +14,6 @@ export const apiClient = axios.create({
 export const fetchToDos = async (): Promise<ToDo[]> => {
     try {
         const response = await apiClient.get<ToDo[]>('/todos');
-        console.log(response.data);
         return response.data;
     } catch (error) {
         console.error('Error fetching todos:', error);
@@ -26,7 +25,6 @@ export const fetchToDos = async (): Promise<ToDo[]> => {
 // ToDo Delete Button action
 export const deleteToDo = async (id: string) => {
     if (window.confirm('Are you sure you want to delete this ToDo?')) {
-        console.log('Uhm should be deleting');
         return await apiClient.delete<string>(`todos/${id}`);
     }
 }
@@ -50,5 +48,28 @@ export const changeToDoStatus = async (id: string, isFinished: boolean) => {
     }
 
 }
+// Get Filtered ToDos
+export const fetchFilteredToDos = async (text?: string, priority?: number | string, isFinished?: boolean | string): Promise<ToDo[]> => {
+    try {
+        // Query parameters
+        const params = new URLSearchParams();
+        if (text) {
+            params.append('text', text);
+        }
+        if (priority !== undefined && priority !== "all") {
+                params.append('priority', priority.toString());
+        }
+        if (isFinished !== undefined && isFinished !== "all") {
+            params.append('isFinished', isFinished.toString());
+        }
+        const response = await apiClient.get(`todos/filter?${params.toString()}`);
+        // Return the filtered ToDos
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching filtered ToDos:', error);
+        throw error;
+    }
+};
+
 
 export default fetchToDos;

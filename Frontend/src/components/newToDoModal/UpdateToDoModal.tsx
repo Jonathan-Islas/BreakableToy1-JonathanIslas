@@ -31,7 +31,6 @@ interface UpdateToDoModalProps {
 export const UpdateToDoModal: React.FC<UpdateToDoModalProps> = ({todo, open = false, setOpen}) => {
     // Get refreshToDos from ToDoContext
     const refreshToDos = useToDos().refreshToDos;
-    console.log()
     //Modal render
     const handleClose = () => setOpen(false);
 

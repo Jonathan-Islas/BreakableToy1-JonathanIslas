@@ -25,6 +25,9 @@ export const FloatingButton: FunctionComponent<FloatingButtonProps> = ({openDial
                 position: 'absolute',
                 left: '85%',
                 top: '90%',
+                '@media(max-width: 600px)': {
+                    left: '70%',
+                }
             }}
         >
             <AddIcon/>

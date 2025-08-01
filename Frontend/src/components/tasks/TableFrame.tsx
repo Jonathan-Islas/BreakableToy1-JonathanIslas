@@ -70,7 +70,6 @@ export const TableFrame = () => {
     // Checkbox ToDo status change
     const handleCheckBoxClick = async (id: string, isFinished: boolean) => {
         try {
-            console.log(isFinished);
             await changeToDoStatus(id, isFinished);
             await refreshToDos();
         } catch (error) {
@@ -90,9 +89,7 @@ export const TableFrame = () => {
 
     // Update IconButton Action
     const handleUpdateClick = (toDo: ToDo) => {
-        console.log('updateClick / / ', toDo);
         setCurrentToDo(toDo);
-        console.log('Current ToDo / / ', currentToDo);
         setOpenUpdateModal(true);
     }
 
@@ -111,7 +108,7 @@ export const TableFrame = () => {
                 <TableHead>
                     <TableRow>
                         <TableCell>Status</TableCell>
-                        <TableCell>Task Name</TableCell>
+                        <TableCell>ToDo Name</TableCell>
                         <TableCell>Priority</TableCell>
                         <TableCell>Due Date</TableCell>
                         <TableCell align={'right'}>Actions</TableCell>
